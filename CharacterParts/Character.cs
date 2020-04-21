@@ -117,13 +117,10 @@ public class Character : MonoBehaviour, ICharacter {
         }
         if (body.velocity.y < moves.max_fall && movement.y > 0.9) {
             body.velocity = new Vector2 (body.velocity.x, Mathf.Lerp (body.velocity.y, moves.max_fall / 3, moves.speed_decay));
-            ////Debug.Log ("FLYING");
         } else if (body.velocity.y < moves.max_fall && movement.y > -0.9) {
             body.velocity = new Vector2 (body.velocity.x, Mathf.Lerp (body.velocity.y, moves.max_fall, moves.speed_decay));
-            ////Debug.Log ("trimming fall speed");
         } else if (body.velocity.y > moves.max_fall && movement.y < -0.9) {
             body.velocity = new Vector2 (body.velocity.x, Mathf.Lerp (body.velocity.y, moves.max_fall, moves.speed_decay));
-            ////Debug.Log ("maximising fall speed");
         }
     }
 }

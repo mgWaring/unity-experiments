@@ -10,4 +10,8 @@ public class Armoury : MonoBehaviour {
                         ObjectPoolManager.instance.CreatePool (type, 5);
                 }
         }
+
+        public void Speak(string str){
+                Debug.Log("Armoury says: " + str);
+        }
 }

@@ -59,27 +59,32 @@ public class PlayerController : MonoBehaviour {
         defend = rw_player.GetAxis ("defend");
         if (rw_player.GetButtonDown ("utility_1")) {
             utility_1 = true;
+            Debug.Log("utility_1");
         }
         if (rw_player.GetButtonDown ("utility_2")) {
             utility_2 = true;
+            Debug.Log("utility_2");
         }
         if (rw_player.GetButtonDown ("jump")) {
             jump = true;
+            Debug.Log("jump");
         }
         if (rw_player.GetButtonDown ("roll")) {
             roll = true;
+            Debug.Log("roll");
         }
         if (rw_player.GetButtonDown ("swap")) {
             swap = true;
+            Debug.Log("swap");
         }
         if (rw_player.GetButtonDown ("grab")) {
             grab = true;
+            Debug.Log("grab");
         }
     }
 
     public void HandleButtons () {
         if (fire > 0) {
-            Debug.Log ((int) Mathf.Sign (movement.x));
             if (ammo.Available ()) {
                 gun.Shoot (ammo.UseRound ());
             } else {

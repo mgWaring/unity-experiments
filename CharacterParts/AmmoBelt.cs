@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class AmmoBelt : MonoBehaviour {
     Dictionary<int, int> ammo = new Dictionary<int, int> ();
-    public int[] keys;
+    public List<int> keys;
     public int active_id = 0;
 
     void Start () {
+        GameManager.instance.armoury.Speak("hello from ammo belt");
         foreach (GameObject type in GameManager.instance.armoury.ammo_types) {
             this.AddAmmo (type.GetInstanceID (), 10);
         }
@@ -32,18 +33,22 @@ public class AmmoBelt : MonoBehaviour {
             ammo[_key] = count;
         }
         ammo.Add (_key, count);
-        ammo.Keys.CopyTo (keys, ammo.Count);
+        Debug.Log("id: " + _key + " tally: " + count);
+        Debug.Log("count of Dict: " + ammo.Count);
+        keys.Add(_key);
+        Debug.Log(keys);
     }
-    public bool UseRound (int _key) {
+    public int UseRound (int _key) {
         if (ammo.ContainsKey (_key)) {
-            ammo[_key] = ammo[_key] - 1;
+            ammo[_key]--;
         }
         return _key;
     }
-    public bool UseRound () {
+    public int UseRound () {
         int _key = keys[active_id];
         if (ammo.ContainsKey (_key)) {
-            ammo[_key] = ammo[_key] - 1;
+            Debug.Log(ammo[_key]);
+            ammo[_key]--;
         }
         return _key;
     }
@@ -63,7 +68,7 @@ public class AmmoBelt : MonoBehaviour {
 
     public void cycle_ammo () {
         active_id++;
-        if (active_id > keys.Length) {
+        if (active_id >= keys.Count) {
             active_id = 0;
         }
     }

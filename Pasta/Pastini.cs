@@ -17,13 +17,14 @@ public class Pastini : ReuseableObject, IShootable {
     }
     protected IEnumerator Age () {
         yield return new WaitForSeconds (lifetime);
-        Expire ();
+        if (gameObject.activeSelf)
+            Expire ();
     }
     public override void OnReuse () {
         Launch ();
         StartCoroutine ("Age");
         //Debug.Log ("Re-using a pastini");
     }
-    public virtual void Fly (){}
-    public virtual void Launch (){}
+    public virtual void Fly () { }
+    public virtual void Launch () { }
 }
