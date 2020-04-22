@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+
 public class GridPopulator : MonoBehaviour {
     public GameObject buttonPrefab;
     private GameManager manager;

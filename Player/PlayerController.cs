@@ -33,9 +33,9 @@ public class PlayerController : MonoBehaviour {
     // Start is called before the first frame update
     void Start () {
         rw_player = ReInput.players.GetPlayer (player_id);
-        character = (character == null) ? gameObject.GetComponent<Character> () : character;
-        ammo = (ammo == null) ? gameObject.GetComponent<AmmoBelt> () : ammo;
-        hud = (hud == null) ? gameObject.GetComponentInChildren<HudManager> () : hud;
+        character = (character == null) ? GetComponent<Character> () : character;
+        ammo = (ammo == null) ? GetComponent<AmmoBelt> () : ammo;
+        hud = (hud == null) ? GetComponentInChildren<HudManager> () : hud;
         character.PledgeAliegence (this);
     }
 
