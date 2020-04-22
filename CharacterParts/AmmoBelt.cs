@@ -3,73 +3,71 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class AmmoBelt : MonoBehaviour {
+    private class Ammo {
+        public int id;
+        public GameObject prefab;
+        public int ammo;
+
+        public Ammo (int id, GameObject go, int am) {
+            id = id;
+            prefab = go;
+            ammo = am;
+        }
+    }
+    Queue<Ammo> _ammo = new Queue<Ammo> ();
+
+    //Dict<instnaceId, number of rounds>
     Dictionary<int, int> ammo = new Dictionary<int, int> ();
-    public List<int> keys;
-    public int active_id = 0;
+    List<GameObject> chamber = new List<GameObject> ();
+    int active_id = 0;
 
     void Start () {
-        GameManager.instance.armoury.Speak("hello from ammo belt");
         foreach (GameObject type in GameManager.instance.armoury.ammo_types) {
-            this.AddAmmo (type.GetInstanceID (), 10);
+            this.AddAmmo (type, 10);
         }
         Debug.Log ("Added " + ammo.Count + " ammo types");
     }
 
-    public bool Available (int _key) {
-        if (ammo.ContainsKey (_key)) {
-            return true;
-        }
-        return false;
+    public GameObject ActiveAmmo(){
+        return chamber[active_id];
     }
-    public bool Available () {
-        int _key = keys[active_id];
-        if (ammo.ContainsKey (_key)) {
-            return true;
+    public void AddAmmo (GameObject type, int count) {
+        if (ammo.ContainsKey (type.GetInstanceID ()) && chamber.Contains (type)) {
+            ammo[type.GetInstanceID ()] += count;
+            return;
         }
-        return false;
+        ammo.Add (type.GetInstanceID (), count);
+        chamber.Add (type);
     }
-    public void AddAmmo (int _key, int count) {
-        if (ammo.ContainsKey (_key)) {
-            ammo[_key] = count;
-        }
-        ammo.Add (_key, count);
-        Debug.Log("id: " + _key + " tally: " + count);
-        Debug.Log("count of Dict: " + ammo.Count);
-        keys.Add(_key);
-        Debug.Log(keys);
-    }
-    public int UseRound (int _key) {
-        if (ammo.ContainsKey (_key)) {
-            ammo[_key]--;
-        }
-        return _key;
-    }
-    public int UseRound () {
-        int _key = keys[active_id];
-        if (ammo.ContainsKey (_key)) {
-            Debug.Log(ammo[_key]);
-            ammo[_key]--;
-        }
-        return _key;
-    }
-    public int CountRounds (int _key) {
+    public int Available (int _key) {
         if (ammo.ContainsKey (_key)) {
             return ammo[_key];
         }
         return 0;
     }
-    public int CountRounds () {
-        int _key = keys[active_id];
+    public int Available () {
+        int _key = chamber[active_id].GetInstanceID ();
         if (ammo.ContainsKey (_key)) {
             return ammo[_key];
         }
         return 0;
     }
-
-    public void cycle_ammo () {
-        active_id++;
-        if (active_id >= keys.Count) {
-            active_id = 0;
+    public GameObject UseRound (int _key) {
+        if (ammo.ContainsKey (_key)) {
+            ammo[_key]--;
+            return chamber.Find (x => x.GetInstanceID () == _key);
         }
+        throw new KeyNotFoundException();
+    }
+    public GameObject UseRound () {
+        int _key = chamber[active_id].GetInstanceID ();
+        Debug.Log ("firing from " + chamber[active_id]);
+        ammo[_key]--;
+        Debug.Log ("leaving behind " + ammo[_key]);
+        return chamber[active_id];
+    }
+    public int Cycle_ammo () {
+        active_id = (active_id >= chamber.Count) ? 0 : active_id++;
+        return active_id;
     }
 }

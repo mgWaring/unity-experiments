@@ -5,13 +5,23 @@ using UnityEngine;
 public class Armoury : MonoBehaviour {
         public GameObject[] ammo_types;
 
+        private Dictionary<int, GameObject> _prefabs = new Dictionary<int, GameObject> ();
+
         void Start () {
                 foreach (GameObject type in ammo_types) {
                         ObjectPoolManager.instance.CreatePool (type, 5);
+                        _prefabs.Add (type.GetInstanceID (), type);
                 }
         }
 
-        public void Speak(string str){
-                Debug.Log("Armoury says: " + str);
+        public GameObject Find (int instance_id) {
+                if (_prefabs.ContainsKey (instance_id)) {
+                        return _prefabs[instance_id];
+                }
+                throw new KeyNotFoundException();
+        }
+
+        public void Speak (string str) {
+                Debug.Log ("Armoury says: " + str);
         }
 }

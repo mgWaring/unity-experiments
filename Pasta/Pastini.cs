@@ -3,11 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Pastini : ReuseableObject, IShootable {
-    public float speed = 1f;
-    public float lifetime = 1f;
-    public float cooldown = 1f;
-    public int bounces = 0;
-    public int bounce_limit = 1;
+    public float speed;
+    public float lifetime;
+    public float cooldown;
+    public int bounces;
+    public int bounce_limit;
+
+    public void Reset () {
+        speed = 1f;
+        lifetime = 1f;
+        cooldown = 1f;
+        bounces = 0;
+        bounce_limit = 1;
+    }
     public void Update () {
         Fly ();
     }

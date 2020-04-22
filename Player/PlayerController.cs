@@ -28,11 +28,14 @@ public class PlayerController : MonoBehaviour {
     private bool grab = false;
     private bool crouch = false;
     public bool double_jump = false;
+    private HudManager hud;
+
     // Start is called before the first frame update
     void Start () {
         rw_player = ReInput.players.GetPlayer (player_id);
         character = (character == null) ? gameObject.GetComponent<Character> () : character;
         ammo = (ammo == null) ? gameObject.GetComponent<AmmoBelt> () : ammo;
+        hud = (hud == null) ? gameObject.GetComponentInChildren<HudManager> () : hud;
         character.PledgeAliegence (this);
     }
 
@@ -45,6 +48,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Update () {
+        Hud();
         GetInput ();
         HandleButtons ();
         Aim ();
@@ -59,45 +63,51 @@ public class PlayerController : MonoBehaviour {
         defend = rw_player.GetAxis ("defend");
         if (rw_player.GetButtonDown ("utility_1")) {
             utility_1 = true;
-            Debug.Log("utility_1");
+            Debug.Log ("utility_1");
         }
         if (rw_player.GetButtonDown ("utility_2")) {
             utility_2 = true;
-            Debug.Log("utility_2");
+            Debug.Log ("utility_2");
         }
         if (rw_player.GetButtonDown ("jump")) {
             jump = true;
-            Debug.Log("jump");
+            Debug.Log ("jump");
         }
         if (rw_player.GetButtonDown ("roll")) {
             roll = true;
-            Debug.Log("roll");
+            Debug.Log ("roll");
         }
         if (rw_player.GetButtonDown ("swap")) {
             swap = true;
-            Debug.Log("swap");
+            Debug.Log ("swap");
         }
         if (rw_player.GetButtonDown ("grab")) {
             grab = true;
-            Debug.Log("grab");
+            Debug.Log ("grab");
         }
     }
 
     public void HandleButtons () {
-        if (fire > 0) {
-            if (ammo.Available ()) {
+        if (fire > 0 && gun.Ready ()) {
+            if (ammo.Available () > 0) {
                 gun.Shoot (ammo.UseRound ());
             } else {
-                gun.Empty();
+                gun.Empty ();
             }
         }
-        if(swap){
-            ammo.cycle_ammo();
+        if (swap) {
+            ammo.Cycle_ammo ();
         }
         if (jump) {
             character.TryToJump ();
             jump = false;
         }
+    }
+    
+    private void Hud(){
+        hud.UpdateAmmoDisplay(ammo);
+        hud.UpdateCharacterDisplay(character);
+        hud.UpdateScoreDisplay(GameManager.instance.scoreboard);
     }
 
     public void Aim () {

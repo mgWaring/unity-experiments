@@ -7,7 +7,7 @@ public class Character : MonoBehaviour, ICharacter {
     //how to cleanly and easily bind groups of sounds?
     private Rigidbody2D body;
     private PlayerController owning_player;
-    public MovementProfile moves;
+    private MovementProfile moves;
     public float jump_cool = 0.2f;
     private int facing = 1;
     public float arm_height = 0.61f;
@@ -29,9 +29,16 @@ public class Character : MonoBehaviour, ICharacter {
     }
     public void Awake () {
         body = GetComponent<Rigidbody2D> ();
+        moves = GetComponent<MovementProfile> ();
     }
     public Vector3 Aim (Vector3 aim) {
-        Vector3 target = new Vector3 (aim.x * noClip, (aim.y * noClip) + arm_height, 0) + transform.position;
+        float vert = Mathf.Sign (aim.y) * noClip;
+        float horz = Mathf.Sign (aim.x) * noClip;
+        if (aim == Vector3.zero) {
+            vert = 0f;
+            horz = facing * noClip;
+        }
+        Vector3 target = new Vector3 (aim.x + horz, (aim.y + vert) + arm_height, 0) + transform.position;
         return target;
     }
     public float AimAngle (Vector3 aim) {
@@ -53,8 +60,8 @@ public class Character : MonoBehaviour, ICharacter {
             //play landing sound
         }
     }
-    //called in fixed update
     public void Move (Vector2 movement) {
+        //called in fixed update
 
         if (movement.x != 0) {
             FaceForward (movement);
@@ -66,10 +73,10 @@ public class Character : MonoBehaviour, ICharacter {
             body.velocity = new Vector2 (facing * moves.min_move, body.velocity.y);
         }
         if (movement.x == 0 && groundCheck.IsGrounded ()) {
-            if (body.velocity.x <= moves.speed_decay)
-                body.velocity = new Vector2 (0, body.velocity.y);
-
             body.velocity = new Vector2 (body.velocity.x - (facing * moves.speed_decay), body.velocity.y);
+            if (Mathf.Abs(body.velocity.x) <= moves.min_move) {
+                body.velocity = new Vector2 (0, body.velocity.y);
+            }
         }
         body.velocity = new Vector2 (body.velocity.x + movement.x * moves.speed, body.velocity.y);
 
@@ -87,7 +94,7 @@ public class Character : MonoBehaviour, ICharacter {
         if (can_jump) {
             can_jump = false;
             Jump ();
-            StartCoroutine ("PrepareJump", false);
+            StartCoroutine ("PrepareJump", true);
         }
     }
     public void Jump () {
@@ -101,6 +108,7 @@ public class Character : MonoBehaviour, ICharacter {
             body.velocity = new Vector2 (body.velocity.x, body.velocity.y + moves.jump_repeat);
         }
     }
+    //separate double and single jump to improve reliability
     private IEnumerator PrepareJump (bool cool_double) {
         yield return new WaitForSeconds (jump_cool);
         if (cool_double) {
