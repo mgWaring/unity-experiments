@@ -69,16 +69,19 @@ public class Character : MonoBehaviour, ICharacter {
 
         float verticalForce = 0;
 
+        //if player isn't moving stick, come to a halt
+        if ((Mathf.Abs (movement.x) < moves.tolerance) && groundCheck.IsGrounded ()) {
+            if (Mathf.Abs (body.velocity.x) <= moves.min_move) {
+                body.velocity = new Vector2 (0, body.velocity.y);
+            } else {
+                body.velocity = new Vector2 (body.velocity.x - (facing * moves.speed_decay), body.velocity.y);
+            }
+        }
+        //
         if ((Mathf.Abs (movement.x) >= moves.tolerance) && (Mathf.Abs (body.velocity.x) < moves.min_move)) {
             body.velocity = new Vector2 (facing * moves.min_move, body.velocity.y);
         }
-        if (movement.x == 0 && groundCheck.IsGrounded ()) {
-            body.velocity = new Vector2 (body.velocity.x - (facing * moves.speed_decay), body.velocity.y);
-            if (Mathf.Abs(body.velocity.x) <= moves.min_move) {
-                body.velocity = new Vector2 (0, body.velocity.y);
-            }
-        }
-        body.velocity = new Vector2 (body.velocity.x + movement.x * moves.speed, body.velocity.y);
+        body.velocity = new Vector2 (body.velocity.x + (movement.x * moves.speed), body.velocity.y);
 
         TrimVelocity (movement);
     }

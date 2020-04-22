@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PenePasta : Pastini {
-    public void Reset () {
+    public override void Reset () {
         speed = 10f;
         lifetime = 2f;
         cooldown = 0.4f;

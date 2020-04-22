@@ -10,21 +10,24 @@ public class MacaroniPasta : Pastini {
     private bool primed = false;
     private bool stuck = false;
     public float fuse_time = 1f;
-    public void Reset () {
+    public override void Reset () {
         speed = 0f;
         lifetime = 10f;
         cooldown = 0.2f;
         bounces = 0;
         bounce_limit = 2;
     }
+    public override void Launch () {
+        gameObject.GetComponent<Rigidbody2D> ().AddForce (transform.right * speed, ForceMode2D.Impulse);
+    }
 
     void OnEnable () {
         StartCoroutine ("Fuse");
     }
-     IEnumerator Fuse(){
-         yield return new WaitForSeconds(fuse_time);
-         primed = true;
-     }
+    private IEnumerator Fuse () {
+        yield return new WaitForSeconds (fuse_time);
+        primed = true;
+    }
 
     public void Stick (GameObject _victim) {
         //record where we're stuck to
@@ -32,7 +35,7 @@ public class MacaroniPasta : Pastini {
         stuck_at = _victim.transform.InverseTransformPoint (transform.position);
         stuck = true;
     }
-    void Update () {
+    public override void Fly () {
         if (primed) {
             Primed ();
         }

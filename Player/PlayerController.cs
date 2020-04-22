@@ -97,6 +97,7 @@ public class PlayerController : MonoBehaviour {
         }
         if (swap) {
             ammo.Cycle_ammo ();
+            swap = false;
         }
         if (jump) {
             character.TryToJump ();

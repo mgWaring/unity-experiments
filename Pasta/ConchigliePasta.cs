@@ -11,9 +11,10 @@ public class ConchigliePasta : Pastini {
         bounce_limit = 5;
     }
     public void Bounce () {
-        if (bounces < bounce_limit) {
-            //assess incoming angle and reflect
-        } else {
+        Debug.Log ("Conchiglie " + GetInstanceID () + " says BOING(" + bounces + ")!");
+        bounces++;
+
+        if (bounces < bounce_limit) { } else {
             //play death noise
             Destroy (gameObject);
         }

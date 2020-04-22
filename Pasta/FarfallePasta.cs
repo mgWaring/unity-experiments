@@ -5,7 +5,7 @@ using UnityEngine;
 public class FarfallePasta : Pastini {
     public float lerp = 0.1f;
     public float lerp_growth = 1.5f;
-    public void Reset () {
+    public override void Reset () {
         speed = 0.5f;
         lifetime = 5f;
         cooldown = 0.6f;
@@ -16,6 +16,7 @@ public class FarfallePasta : Pastini {
         gameObject.GetComponent<Rigidbody2D> ().AddForce (transform.right * speed, ForceMode2D.Impulse);
     }
     public void Bounce () {
+        bounces++;
         if (bounces < bounce_limit) {
             //assess incoming angle and reflect
         } else {
@@ -27,7 +28,7 @@ public class FarfallePasta : Pastini {
         //play impact noise
         Bounce ();
     }
-    public void Fly () {
+    public override void Fly () {
         transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0, 0, 90), lerp * lerp_growth * Time.deltaTime);
         transform.position += (transform.right + new Vector3 (speed, 0, 0)) * Time.deltaTime;
     }
