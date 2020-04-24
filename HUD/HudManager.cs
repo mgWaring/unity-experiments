@@ -17,7 +17,7 @@ public class HudManager : MonoBehaviour {
     }
     public void UpdateCharacterDisplay (Character character){
         character_renderer.GetComponent<Image>().sprite = character.GetComponent<SpriteRenderer>().sprite;
-        character_text.GetComponent<TextMeshProUGUI> ().text = character.transform.position.ToString();
+        character_text.GetComponent<TextMeshProUGUI> ().text = character.GetComponent<Rigidbody2D>().velocity.x.ToString();
 
     }
     public void UpdateScoreDisplay (Scoreboard scoreboard){

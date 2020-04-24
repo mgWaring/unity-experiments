@@ -3,19 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class FusiliPasta : Pastini {
-    public override void Reset () {
-        speed = 1f;
-        lifetime = 2f;
-        cooldown = 0.4f;
-        bounces = 0;
-        bounce_limit = 1;
-    }
     public override void Launch () {
-        gameObject.GetComponent<Rigidbody2D> ().AddForce(transform.right * speed, ForceMode2D.Impulse);
+        Debug.Log ("" + this.GetType ().Name + " is launching");
+        gameObject.GetComponent<Rigidbody2D> ().AddForce(transform.right * config.speed, ForceMode2D.Impulse);
     }
     public void Bounce () {
         bounces++;
-        if (bounces >= bounce_limit) {
+        if (bounces >= config.bounce_limit) {
             //play death noise
             Destroy (gameObject);
         }

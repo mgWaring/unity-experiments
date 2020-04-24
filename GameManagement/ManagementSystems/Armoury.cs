@@ -9,7 +9,7 @@ public class Armoury : MonoBehaviour {
 
         void Start () {
                 foreach (GameObject type in ammo_types) {
-                        ObjectPoolManager.instance.CreatePool (type, 5);
+                        ObjectPoolManager.instance.CreatePool (type, 500);
                         _prefabs.Add (type.GetInstanceID (), type);
                 }
         }
@@ -19,9 +19,5 @@ public class Armoury : MonoBehaviour {
                         return _prefabs[instance_id];
                 }
                 throw new KeyNotFoundException();
-        }
-
-        public void Speak (string str) {
-                Debug.Log ("Armoury says: " + str);
         }
 }

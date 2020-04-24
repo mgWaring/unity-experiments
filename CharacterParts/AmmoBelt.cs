@@ -25,7 +25,7 @@ public class AmmoBelt : MonoBehaviour {
         foreach (GameObject type in GameManager.instance.armoury.ammo_types) {
             this.AddAmmo (type, 100);
         }
-        Debug.Log ("Added " + ammo.Count + " ammo types");
+       //Debug.Log ("Added " + ammo.Count + " ammo types");
     }
 
     public GameObject ActiveAmmo () {
@@ -61,15 +61,15 @@ public class AmmoBelt : MonoBehaviour {
     }
     public GameObject UseRound () {
         int _key = chamber[active_id].GetInstanceID ();
-        Debug.Log ("firing from " + chamber[active_id]);
+       //Debug.Log ("firing from " + chamber[active_id]);
         ammo[_key]--;
-        Debug.Log ("leaving behind " + ammo[_key]);
+       //Debug.Log ("leaving behind " + ammo[_key]);
         return chamber[active_id];
     }
     public int Cycle_ammo () {
-        Debug.Log ("was: " + active_id + "| chamber count: " + chamber.Count);
+       //Debug.Log ("was: " + active_id + "| chamber count: " + chamber.Count);
         active_id = (active_id >= chamber.Count-1) ? 0 : active_id + 1;
-        Debug.Log ("now: " + active_id + "| chamber count: " + chamber.Count);
+       //Debug.Log ("now: " + active_id + "| chamber count: " + chamber.Count);
         return active_id;
     }
 }

@@ -19,11 +19,11 @@ public class PastaGun : MonoBehaviour {
     public void Shoot (GameObject shot) {
         ObjectPoolManager.instance.ReuseObject (shot.GetInstanceID (), transform.position, Quaternion.Euler (0, 0, angle));
         if (shot.GetComponent<Pastini> ())
-            StartCoroutine ("CoolShot", shot.GetComponent<Pastini> ().cooldown);
+            StartCoroutine ("CoolShot", shot.GetComponent<Pastini> ().Cooldown());
         gun_ready = false;
     }
     public void Empty () {
-        Debug.Log ("no ammo!");
+       //Debug.Log ("no ammo!");
     }
 
     private IEnumerator CoolShot (float seconds) {

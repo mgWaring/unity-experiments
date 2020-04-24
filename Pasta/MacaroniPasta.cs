@@ -9,20 +9,16 @@ public class MacaroniPasta : Pastini {
     private GameObject victim;
     private bool primed = false;
     private bool stuck = false;
-    public float fuse_time = 1f;
-    public override void Reset () {
-        speed = 0f;
-        lifetime = 10f;
-        cooldown = 0.2f;
-        bounces = 0;
-        bounce_limit = 2;
-    }
+    public float fuse_time = 2f;
+
     public override void Launch () {
-        gameObject.GetComponent<Rigidbody2D> ().AddForce (transform.right * speed, ForceMode2D.Impulse);
+        Debug.Log ("" + this.GetType ().Name + " is launching");
+        gameObject.GetComponent<Rigidbody2D> ().AddForce (transform.right * config.speed, ForceMode2D.Impulse);
     }
 
     void OnEnable () {
-        StartCoroutine ("Fuse");
+        StopCoroutine (Fuse ());
+        StartCoroutine (Fuse ());
     }
     private IEnumerator Fuse () {
         yield return new WaitForSeconds (fuse_time);
@@ -36,12 +32,18 @@ public class MacaroniPasta : Pastini {
         stuck = true;
     }
     public override void Fly () {
+        if (stuck) {
+            ClingToTarget ();
+        }
         if (primed) {
-            Primed ();
+            CheckForVictims ();
         }
     }
-    void Primed () {
+
+    void ClingToTarget () {
         transform.position = victim.transform.TransformPoint (stuck_at);
+    }
+    void CheckForVictims () {
         if (Physics2D.OverlapCircle (transform.position, proximity_range, potential_victims)) {
             Explode ();
         }

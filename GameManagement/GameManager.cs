@@ -19,7 +19,4 @@ public class GameManager : GameSingleton<GameManager> {
             scoreboard = gameObject.GetComponent<Scoreboard> ();
             soundPlayer = gameObject.GetComponent<SoundPlayer> ();
       }
-      public void Speak (string str) {
-            Debug.Log ("we're inside the GameManager: " + str);
-      }
 }

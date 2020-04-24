@@ -18,10 +18,10 @@ public class PoolInstance {
         }
     }
     public void Reuse (Vector3 pos, Quaternion rot) {
+        _gameObject.SetActive (true);
         if (reusable) {
             reusableObject.OnReuse ();
         }
-        _gameObject.SetActive (true);
         transform.position = pos;
         transform.rotation = rot;
     }
