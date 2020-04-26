@@ -25,21 +25,15 @@ public class Character : MonoBehaviour, ICharacter {
         moves = GetComponent<MovementProfile> ();
     }
     public Vector3 Aim (Vector3 aim) {
-        float vert = Mathf.Sign (aim.y) * noClip;
-        float horz = Mathf.Sign (aim.x) * noClip;
-        if (aim == Vector3.zero) {
-            vert = 0f;
-            horz = facing * noClip;
-        }
-        Vector3 target = new Vector3 (aim.x + horz, (aim.y + vert) + arm_height, 0) + transform.position;
-        return target;
+        if (aim == Vector3.zero)
+            aim = new Vector3 (facing, 0, 0);
+        aim = aim + new Vector3 (0, arm_height, 0);
+        return transform.position + (aim.normalized * noClip);
     }
     public float AimAngle (Vector3 aim) {
-        if (aim == Vector3.zero) {
+        if (aim == Vector3.zero)
             aim = new Vector2 (facing, 0);
-        }
-        float _angle = Vector2.Angle (Vector2.right, aim);
-        _angle = (aim.y > 0) ? _angle : _angle * -1;
+        float _angle = Vector2.SignedAngle (Vector2.right, aim);
         return _angle;
     }
     void Update () {
@@ -49,10 +43,12 @@ public class Character : MonoBehaviour, ICharacter {
         if (!groundCheck.WasGrounded () && groundCheck.IsGrounded ()) {
             //neutralise latent Y velocities 
             body.angularVelocity = 0f;
+            //play landing sound
+        }
+        if (groundCheck.IsGrounded ()) {
             can_jump = true;
             can_double_jump = true;
             jump_ready = true;
-            //play landing sound
         }
     }
     public void Move (Vector2 movement) {
@@ -62,26 +58,20 @@ public class Character : MonoBehaviour, ICharacter {
             FaceForward (movement);
         }
 
-        float verticalForce = 0;
-
         //if player isn't moving stick, come to a halt
         if ((Mathf.Abs (movement.x) < moves.tolerance)) {
             if (Mathf.Abs (body.velocity.x) <= moves.min_move) {
-                Debug.Log ("stopping");
                 body.velocity = new Vector2 (0, body.velocity.y);
             } else {
-                Debug.Log ("slowing");
                 body.velocity = new Vector2 (body.velocity.x - (facing * moves.speed_decay), body.velocity.y);
             }
         }
         //if we're under the min movement speed, go straight to the min movespeed
         if ((Mathf.Abs (movement.x) >= moves.tolerance) && (Mathf.Abs (body.velocity.x) < moves.min_move)) {
-            Debug.Log ("going to MIN");
             body.velocity = new Vector2 (facing * moves.min_move, body.velocity.y);
         }
         //add movement from controller
         if (Mathf.Abs (movement.x) >= moves.tolerance) {
-            Debug.Log ("Accellerating beyond MIN");
             body.velocity = new Vector2 (body.velocity.x + (movement.x * moves.speed * Time.deltaTime), body.velocity.y);
         }
 
@@ -101,8 +91,7 @@ public class Character : MonoBehaviour, ICharacter {
             if (groundCheck.IsGrounded () && can_jump) {
                 can_jump = false;
                 body.velocity = new Vector2 (body.velocity.x, body.velocity.y + moves.jump_init);
-            }
-            if (!groundCheck.IsGrounded () && can_double_jump) {
+            } else if (!groundCheck.IsGrounded () && can_double_jump) {
                 can_double_jump = false;
                 body.velocity = new Vector2 (body.velocity.x, body.velocity.y + moves.jump_repeat);
             }

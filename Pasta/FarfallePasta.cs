@@ -7,7 +7,6 @@ public class FarfallePasta : Pastini {
     public float lerp_growth = 1.5f;
 
     public override void Launch () {
-        Debug.Log ("" + this.GetType ().Name + " is launching");
         gameObject.GetComponent<Rigidbody2D> ().AddForce (transform.right * config.speed, ForceMode2D.Impulse);
     }
     public void Bounce () {

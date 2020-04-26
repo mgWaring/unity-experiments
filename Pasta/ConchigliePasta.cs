@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class ConchigliePasta : Pastini {
     public void Bounce () {
-        Debug.Log ("Conchiglie " + GetInstanceID () + " says BOING(" + bounces + ")!");
         bounces++;
-
-        if (bounces >= config.bounce_limit) {
+        if (bounces >= this.config.bounce_limit) {
             //play death noise
             Destroy (gameObject);
         }
@@ -17,7 +15,7 @@ public class ConchigliePasta : Pastini {
         Bounce ();
     }
     public override void Launch () {
-        Debug.Log ("" + this.GetType ().Name + " is launching");
-        gameObject.GetComponent<Rigidbody2D> ().AddForce (transform.right * config.speed, ForceMode2D.Impulse);
+        float _speed = this.config.speed;
+        GetComponent<Rigidbody2D> ().AddForce (transform.right * _speed, ForceMode2D.Impulse);
     }
 }

@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     void FixedUpdate () {
-        character.Move (movement);
+        //character.Move (movement);
     }
 
     void Update () {
@@ -52,6 +52,8 @@ public class PlayerController : MonoBehaviour {
         GetInput ();
         HandleButtons ();
         Aim ();
+        character.Move (movement);
+
     }
 
     private void GetInput () {
@@ -96,6 +98,7 @@ public class PlayerController : MonoBehaviour {
             }
         }
         if (swap) {
+            Debug.Log("swapping ammo");
             ammo.Cycle_ammo ();
             swap = false;
         }
@@ -108,6 +111,7 @@ public class PlayerController : MonoBehaviour {
     private void Hud(){
         hud.UpdateAmmoDisplay(ammo);
         hud.UpdateCharacterDisplay(character);
+        hud.UpdateGunDisplay(gun);
         hud.UpdateScoreDisplay(GameManager.instance.scoreboard);
     }
 

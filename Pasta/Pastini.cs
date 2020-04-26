@@ -7,19 +7,21 @@ public class Pastini : ReuseableObject, IShootable {
     protected int bounces = 0;
 
     void Awake () {
-        PastaConfig config = GetComponent<PastaConfig> ();
+        config = GetComponent<PastaConfig> ();
     }
     void Start () {
         OnReuse ();
     }
-    public float Cooldown(){
+    void OnDisable () {
+        StopCoroutine (Age ());
+    }
+    public float Cooldown () {
+        config = GetComponent<PastaConfig> ();
         return config.cooldown;
     }
-
     public void Update () {
         this.Fly ();
     }
-    //override this with specific pastini re-set requirements if needed
     public void Expire () {
         this.Destroy ();
     }
@@ -31,17 +33,11 @@ public class Pastini : ReuseableObject, IShootable {
     }
     public override void OnReuse () {
         if (gameObject.activeSelf) {
-        StopCoroutine(Age());
             GetComponent<Rigidbody2D> ().velocity = Vector3.zero;
-            transform.rotation = Quaternion.identity;
             Launch ();
-            StartCoroutine (Age());
+            StartCoroutine (Age ());
         }
     }
-    public virtual void Fly () {
-
-     }
-    public virtual void Launch () {
-        Debug.Log ("PASTINI: " + this.GetType ().Name + " is launching");
-    }
+    public virtual void Fly () { }
+    public virtual void Launch () { }
 }
