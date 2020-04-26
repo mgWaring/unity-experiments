@@ -15,7 +15,6 @@ public class ConchigliePasta : Pastini {
         Bounce ();
     }
     public override void Launch () {
-        float _speed = this.config.speed;
-        GetComponent<Rigidbody2D> ().AddForce (transform.right * _speed, ForceMode2D.Impulse);
+        gameObject.GetComponent<Rigidbody2D> ().AddForce (transform.right * config.speed, ForceMode2D.Impulse);
     }
 }

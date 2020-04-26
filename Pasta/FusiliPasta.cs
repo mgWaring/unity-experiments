@@ -15,7 +15,6 @@ public class FusiliPasta : Pastini {
             if (gameObject.activeSelf) {
                 Vector3 dir = transform.position - prev;
                 float _angle = Vector2.SignedAngle (Vector2.right, dir.normalized);
-                Debug.Log ("was:" + prev + " is: " + transform.position + "Angle: " + _angle + " Dir: " + dir);
                 transform.rotation = Quaternion.Euler (0, 0, _angle);
             }
         }
@@ -31,15 +30,5 @@ public class FusiliPasta : Pastini {
     public void OnCollisionEnter2D (Collision2D collision) {
         //play impact noise
         Bounce ();
-        //Reflect (collision);
-    }
-    private void Reflect (Collision2D collision) {
-        ContactPoint2D meet = collision.GetContact (0);
-        Vector3 pos = transform.position.normalized;
-        Vector2 reflected = Vector2.Reflect (pos, meet.normal);
-        Debug.Log ("pos: " + pos + " normal: " + meet.normal + "reflected: " + reflected);
-        float _angle = Vector2.SignedAngle (Vector2.Perpendicular (meet.normal), reflected);
-        Debug.Log ("" + _angle);
-        transform.rotation = Quaternion.Euler (0, 0, _angle);
     }
 }

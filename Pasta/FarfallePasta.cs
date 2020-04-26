@@ -22,8 +22,4 @@ public class FarfallePasta : Pastini {
         //play impact noise
         Bounce ();
     }
-    public override void Fly () {
-        transform.rotation = Quaternion.Lerp (transform.rotation, Quaternion.Euler (0, 0, 90), lerp * lerp_growth * Time.deltaTime);
-        transform.position += (transform.right + new Vector3 (config.speed, 0, 0)) * Time.deltaTime;
-    }
 }

@@ -24,7 +24,7 @@ public class SceneLoader : MonoBehaviour {
     //-----------------------------------------------------------------------------------------------------
     private static string[] ReadNames (List<string> excludeList) {
         List<string> temp = new List<string> ();
-        //Debug.Log ("Exclusions will be: " + String.Join (", ", excludeList.ToArray ()));
+        Debug.Log ("Exclusions will be: " + String.Join (", ", excludeList.ToArray ()));
         foreach (UnityEditor.EditorBuildSettingsScene S in UnityEditor.EditorBuildSettings.scenes) {
             if (S.enabled) {
                 string name = S.path.Substring (S.path.LastIndexOf ('/') + 1);
@@ -36,7 +36,7 @@ public class SceneLoader : MonoBehaviour {
             }
         }
         string[] arr = temp.ToArray ();
-        //Debug.Log ("Scenes are: " + String.Join (", ", arr));
+        Debug.Log ("Scenes are: " + String.Join (", ", arr));
         return arr;
     }
 
@@ -74,7 +74,7 @@ public class SceneLoader : MonoBehaviour {
 
     void SaveNameFile () {
         CreateResourceDirs ();
-        //Debug.Log ("Saving level names..." + BuildSaveFilename ());
+        Debug.Log ("Saving level names..." + BuildSaveFilename ());
 
         FileStream file = File.Create (BuildSaveFilename ());
         BinaryWriter bw = new BinaryWriter (file);
@@ -102,20 +102,17 @@ public class SceneLoader : MonoBehaviour {
     void Awake () {
         PopulateExclusions ();
         Reset ();
-        //Debug.Log (this.levels);
     }
     //-----------------------------------------------------------------------------------------------------
 #else
     void Awake () {
         string str = LoadLevelNames ();
-        //Debug.Log ("Levels loaded are: " + str);
     }
     //-----------------------------------------------------------------------------------------------------
 #endif
 
     string BuildLoadFilename () {
         return levelsDirectory + "/" + sceneFilename;
-        //return "LevelNames/" + sceneFilename;
     }
     string LoadLevelNames () {
         string returnString = "Loaded: ";

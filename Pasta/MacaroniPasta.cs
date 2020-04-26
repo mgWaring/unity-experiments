@@ -58,7 +58,9 @@ public class MacaroniPasta : Pastini {
         if (primed) {
             Explode ();
         } else {
+            float _angle = Vector2.SignedAngle (Vector2.up, collision.GetContact (0).normal);
             //play impact noise
+            transform.rotation = Quaternion.Euler (0, 0, _angle);
             Stick (collision.gameObject);
         }
     }
