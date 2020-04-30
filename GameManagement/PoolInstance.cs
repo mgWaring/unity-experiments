@@ -29,4 +29,7 @@ public class PoolInstance {
     public void SetParent (Transform parent) {
         transform.parent = parent;
     }
+    public GameObject GameObject(){
+        return _gameObject;
+    }
 }

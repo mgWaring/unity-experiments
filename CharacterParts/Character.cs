@@ -8,14 +8,16 @@ public class Character : MonoBehaviour, ICharacter {
     private Rigidbody2D body;
     private PlayerController owning_player;
     private MovementProfile moves;
-    public float jump_cool = 0.05f;
     private int facing = 1;
+    public float jump_cool = 0.05f;
     public float arm_height = 0.61f;
-    public GroundCheck groundCheck;
     public float noClip = 0.5f;
     public bool can_jump = true;
     public bool can_double_jump = false;
     public bool jump_ready = true;
+    public GroundCheck groundCheck;
+    public Sprite death_sprite;
+    public GameObject hat;
 
     public void PledgeAliegence (PlayerController player) {
         this.owning_player = player;
@@ -42,7 +44,7 @@ public class Character : MonoBehaviour, ICharacter {
     void CheckLanded () {
         if (!groundCheck.WasGrounded () && groundCheck.IsGrounded ()) {
             //neutralise latent Y velocities 
-            body.angularVelocity = 0f;
+            //body.angularVelocity = 0f;
             //play landing sound
         }
         if (groundCheck.IsGrounded ()) {
@@ -53,6 +55,11 @@ public class Character : MonoBehaviour, ICharacter {
     }
     public void Move (Vector2 movement) {
         //called in fixed update
+        if(groundCheck.IsGrounded ()){
+            body.gravityScale = moves.grounded_gravity;
+        } else {
+            body.gravityScale = moves.airborne_gravity;
+        }
 
         if (movement.x != 0) {
             FaceForward (movement);
@@ -72,7 +79,7 @@ public class Character : MonoBehaviour, ICharacter {
         }
         //add movement from controller
         if (Mathf.Abs (movement.x) >= moves.tolerance) {
-            body.velocity = new Vector2 (body.velocity.x + (movement.x * moves.speed * Time.deltaTime), body.velocity.y);
+            body.AddForce(new Vector2 (movement.x * moves.speed,0));
         }
 
         TrimVelocity (movement);
@@ -106,6 +113,7 @@ public class Character : MonoBehaviour, ICharacter {
         float decay = moves.speed_decay;
         //if we've hit max speed, trim speed
         if (Mathf.Abs (body.velocity.x) > moves.max_move) {
+            Debug.Log("trimming x");
             body.velocity = new Vector2 (Mathf.Lerp (body.velocity.x, facing * moves.max_move, decay), body.velocity.y);
         }
         //if we're falling, amplify the fall speed

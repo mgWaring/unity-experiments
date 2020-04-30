@@ -21,11 +21,13 @@ public class ObjectPoolManager : GameSingleton<ObjectPoolManager> {
         }
     }
 
-    public void ReuseObject (int key, Vector3 pos, Quaternion rot) {
+    public GameObject ReuseObject (int key, Vector3 pos, Quaternion rot) {
         if (pools.ContainsKey (key)) {
             PoolInstance reused = pools[key].Dequeue ();
             pools[key].Enqueue (reused);
             reused.Reuse (pos, rot);
+            return reused.GameObject ();
         }
+        throw new KeyNotFoundException();
     }
 }

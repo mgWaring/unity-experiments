@@ -20,4 +20,6 @@ public class MovementProfile : MonoBehaviour {
     public float speed_decay;
 
     public float fall_amp;
+    public float grounded_gravity;
+    public float airborne_gravity;
 }
