@@ -1,134 +1,150 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class Character : MonoBehaviour, ICharacter {
-    //public Dictionary<string, AudioGroup> pools = new Dictionary<string, AudioGroup> ();
-    //how to cleanly and easily bind groups of sounds?
-    private Rigidbody2D body;
-    private PlayerController owning_player;
-    private MovementProfile moves;
-    private int facing = 1;
-    public float jump_cool = 0.05f;
-    public float arm_height = 0.61f;
-    public float noClip = 0.5f;
-    public bool can_jump = true;
-    public bool can_double_jump = false;
-    public bool jump_ready = true;
-    public GroundCheck groundCheck;
-    public Sprite death_sprite;
-    public GameObject hat;
+[RequireComponent(typeof(Controller2D))]
 
-    public void PledgeAliegence (PlayerController player) {
-        this.owning_player = player;
+//previously known as player
+public class Character : MonoBehaviour
+{
+    // Inspector Variables
+    [SerializeField] private float moveSpeed = 6f; // 6f
+    public float MoveSpeed { get { return moveSpeed; } }
+    // Assign values to these to determine gravity and jumpVelocity
+    [SerializeField] private float maxJumpHeight = 4f; // 4f
+    [SerializeField] private float timeToJumpApex = 0.4f; // 0.4f
+    // X Velocity Smoothing Variables
+    [SerializeField] private float accelerationTimeAirborne = 0.2f; // 0.2f
+    [SerializeField] private float accelerationTimeGrounded = 0.1f; // 0.1f
+    [SerializeField] private float wallSlideSpeedMax = 3;
+    [SerializeField] private Vector2 wallJumpClimb;
+    [SerializeField] private Vector2 wallJumpOff;
+    [SerializeField] private Vector2 wallLeap;
+    [SerializeField] private float wallStickTime = 0.25f;
+    [SerializeField] private float jump_cool, flip_duration = 0.1f;
+    [SerializeField] private float arm_height = 0.25f;
+    [SerializeField] private float arm_length = 0.25f;
+    //move this
+    [SerializeField] public Sprite death_sprite;
+
+    private Player player;
+    private bool jump_ready, jump, swing;
+    private float flip_progress, facing = 1f;
+    private Coroutine cooldown;
+    // Start Variables
+    public Controller2D controller;
+    public Movement movement;
+
+    // Interfaces
+    public IUnityService UnityService;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        controller = GetComponent<Controller2D>();
+        //movement = new Movement();
+
+        if (UnityService == null)
+            UnityService = new UnityService();
+
     }
-    public void Awake () {
-        body = GetComponent<Rigidbody2D> ();
-        moves = GetComponent<MovementProfile> ();
-    }
-    public Vector3 Aim (Vector3 aim) {
-        if (aim == Vector3.zero)
-            aim = new Vector3 (facing, 0, 0);
-        aim = aim + new Vector3 (0, arm_height, 0);
-        return transform.position + (aim.normalized * noClip);
-    }
-    public float AimAngle (Vector3 aim) {
-        if (aim == Vector3.zero)
-            aim = new Vector2 (facing, 0);
-        float _angle = Vector2.SignedAngle (Vector2.right, aim);
-        return _angle;
-    }
-    void Update () {
-        CheckLanded ();
-    }
-    void CheckLanded () {
-        if (!groundCheck.WasGrounded () && groundCheck.IsGrounded ()) {
-            //neutralise latent Y velocities 
-            //body.angularVelocity = 0f;
-            //play landing sound
+
+    // Input dependent variables should be checked here because
+    // Update is called more frequently than FixedUpdate()
+    public void Move(Vector2 input)
+    {
+        int wallDirX = (controller.Collisions.left) ? -1 : 1;
+
+        movement.CalculateVelocityX(
+            input.x,
+            (controller.Collisions.below) ? accelerationTimeGrounded : accelerationTimeAirborne
+            );
+
+        bool wallSliding = false;
+        if ((controller.Collisions.left || controller.Collisions.right) && !controller.Collisions.below && movement.Velocity.y < 0)
+        {
+            wallSliding = true;
+            movement.CalculateWallSlide(input.x, wallDirX, UnityService.GetFixedDeltaTime());
         }
-        if (groundCheck.IsGrounded ()) {
-            can_jump = true;
-            can_double_jump = true;
+
+        if (jump && jump_ready)
+        {
+            if (wallSliding)
+            {
+                movement.CalculateWallJump(input.x, wallDirX);
+
+            }
+            if (controller.Collisions.below)
+            {
+                movement.Jump(transform.position.y);
+            }
+        }
+
+        if (!jump)
+        {
+            movement.DoubleGravity();
+        }
+
+        Vector3 velocity = movement.CalculateVelocity(UnityService.GetFixedDeltaTime(), transform.position.y);
+        controller.Move(velocity);
+        FaceForward(velocity);
+
+
+        // Removes the accumulation of gravity
+        if (controller.Collisions.above || controller.Collisions.below)
+        {
+            movement.ZeroVelocityY();
+        }
+    }
+    public void Jump()
+    {
+        jump = true;
+        cooldown = StartCoroutine(ResetJump());
+    }
+    public void JumpReleased()
+    {
+        jump = false;
+        if (cooldown != null)
+        {
+            StopCoroutine(cooldown);
             jump_ready = true;
         }
     }
-    public void Move (Vector2 movement) {
-        //called in fixed update
-        if(groundCheck.IsGrounded ()){
-            body.gravityScale = moves.grounded_gravity;
-        } else {
-            body.gravityScale = moves.airborne_gravity;
-        }
 
-        if (movement.x != 0) {
-            FaceForward (movement);
-        }
-
-        //if player isn't moving stick, come to a halt
-        if ((Mathf.Abs (movement.x) < moves.tolerance)) {
-            if (Mathf.Abs (body.velocity.x) <= moves.min_move) {
-                body.velocity = new Vector2 (0, body.velocity.y);
-            } else {
-                body.velocity = new Vector2 (body.velocity.x - (facing * moves.speed_decay), body.velocity.y);
-            }
-        }
-        //if we're under the min movement speed, go straight to the min movespeed
-        if ((Mathf.Abs (movement.x) >= moves.tolerance) && (Mathf.Abs (body.velocity.x) < moves.min_move)) {
-            body.velocity = new Vector2 (facing * moves.min_move, body.velocity.y);
-        }
-        //add movement from controller
-        if (Mathf.Abs (movement.x) >= moves.tolerance) {
-            body.AddForce(new Vector2 (movement.x * moves.speed,0));
-        }
-
-        TrimVelocity (movement);
+    public void PledgeAliegence(Player _player)
+    {
+        player = _player;
     }
-    private void FaceForward (Vector2 movement) {
-        int oldFacing = facing;
-        facing = (int) Mathf.Sign (movement.x);
-        if (facing != oldFacing) {
-            Quaternion target = Quaternion.Euler (0, (facing > 0) ? 0 : 180, 0);
-            transform.rotation = Quaternion.Slerp (transform.rotation, target, 0.9f);
-        }
-    }
-    public void Jump () {
-        if (jump_ready) {
-            jump_ready = false;
-            if (groundCheck.IsGrounded () && can_jump) {
-                can_jump = false;
-                body.velocity = new Vector2 (body.velocity.x, body.velocity.y + moves.jump_init);
-            } else if (!groundCheck.IsGrounded () && can_double_jump) {
-                can_double_jump = false;
-                body.velocity = new Vector2 (body.velocity.x, body.velocity.y + moves.jump_repeat);
-            }
-            StartCoroutine (ResetJump ());
-        }
-    }
-    private IEnumerator ResetJump () {
-        yield return new WaitForSeconds (jump_cool);
+    private IEnumerator ResetJump()
+    {
+        yield return new WaitForSeconds(jump_cool);
         jump_ready = true;
     }
-    private void TrimVelocity (Vector2 movement) {
-        float decay = moves.speed_decay;
-        //if we've hit max speed, trim speed
-        if (Mathf.Abs (body.velocity.x) > moves.max_move) {
-            Debug.Log("trimming x");
-            body.velocity = new Vector2 (Mathf.Lerp (body.velocity.x, facing * moves.max_move, decay), body.velocity.y);
+    private void FaceForward(Vector3 input)
+    {
+        flip_progress += Time.deltaTime;
+        float oldFacing = facing;
+        facing = Mathf.Sign(input.x);
+        Quaternion target = Quaternion.Euler(0, (facing > 0) ? 0 : 180, 0);
+
+        if (facing != oldFacing) flip_progress = 0;
+        if (flip_progress <= flip_duration)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, target, flip_progress / flip_duration);
         }
-        //if we're falling, amplify the fall speed
-        if (body.velocity.y < 0) {
-            body.velocity = new Vector2 (body.velocity.x, (body.velocity.y * moves.fall_amp));
-        }
-        //if we're falling more than /3 speed and player is pushing up, float a bit
-        if (body.velocity.y < (moves.max_fall / 3) && movement.y > 0.9) {
-            body.velocity = new Vector2 (body.velocity.x, Mathf.Lerp (body.velocity.y, (moves.max_fall / 3), decay));
-            //if player isn't doing anything and we're exceeding fall speed, trim fall speed
-        } else if (body.velocity.y < moves.max_fall && movement.y > -0.9) {
-            body.velocity = new Vector2 (body.velocity.x, Mathf.Lerp (body.velocity.y, moves.max_fall, decay));
-            //if we're not falling max speed (or rising) and player pulls down, plummet towards max fall speed
-        } else if (body.velocity.y > moves.max_fall && movement.y < -0.9) {
-            body.velocity = new Vector2 (body.velocity.x, Mathf.Lerp (body.velocity.y, moves.max_fall, decay));
-        }
+    }
+    public Vector3 Aim(Vector3 aim)
+    {
+        aim = (aim == Vector3.zero) ? new Vector3(facing, 0, 0) : aim;
+        aim += (new Vector3(0, arm_height, 0));
+        return transform.position + (aim.normalized * arm_length);
+    }
+    public float AimAngle(Vector3 aim)
+    {
+        aim = (aim == Vector3.zero) ? new Vector3(facing, 0) : aim;
+        float _angle = Vector2.SignedAngle(Vector2.right, aim);
+        return _angle;
     }
 }

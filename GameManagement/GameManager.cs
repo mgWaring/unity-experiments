@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GameManager : GameSingleton<GameManager> {
       public Armoury armoury;
-      public NetworkManager networkManager;
       public PlayerIndex playerIndex;
       public Roster roster;
       public SceneLoader sceneLoader;
@@ -12,7 +11,6 @@ public class GameManager : GameSingleton<GameManager> {
       public SoundPlayer soundPlayer;
       void Awake () {
             armoury = gameObject.GetComponent<Armoury> ();
-            networkManager = gameObject.GetComponent<NetworkManager> ();
             playerIndex = gameObject.GetComponent<PlayerIndex> ();
             roster = gameObject.GetComponent<Roster> ();
             sceneLoader = gameObject.GetComponent<SceneLoader> ();

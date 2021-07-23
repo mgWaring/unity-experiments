@@ -1,3 +1,3 @@
 ﻿public interface IAct {
-    void Act (PlayerController player);
+    void Act (Player player);
 }

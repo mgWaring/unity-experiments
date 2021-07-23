@@ -4,8 +4,8 @@ using UnityEngine;
 
 public abstract class GrappleAction : IAct
 {
-    public void Act(PlayerController player)
+    public void Act(Player player)
     {
-        //Debug.Log("Grapple it!");
+        Debug.Log("Grapple it!");
     }    
 }
