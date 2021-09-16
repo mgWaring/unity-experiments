@@ -9,7 +9,7 @@ public class GameManager : GameSingleton<GameManager> {
       public SceneLoader sceneLoader;
       public Scoreboard scoreboard;
       public SoundPlayer soundPlayer;
-      void Awake () {
+      protected override void OnAwake () {
             armoury = gameObject.GetComponent<Armoury> ();
             playerIndex = gameObject.GetComponent<PlayerIndex> ();
             roster = gameObject.GetComponent<Roster> ();
